@@ -1,0 +1,32 @@
+{
+  "name": "dev-connect-monorepo",
+  "version": "1.0.0",
+  "description": "DevConnect Monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@dev-connect/backend",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace=@dev-connect/backend",
+    "clean": "npm run clean --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NishanBangera/DevConnect.git"
+  },
+  "keywords": [
+    "monorepo",
+    "dev-connect"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NishanBangera/DevConnect/issues"
+  },
+  "homepage": "https://github.com/NishanBangera/DevConnect#readme",
+  "devDependencies": {}
+}

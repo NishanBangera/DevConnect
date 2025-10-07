@@ -1,0 +1,25 @@
+# Dependencies
+# Track the root package-lock.json for reproducible installs in the monorepo
+node_modules
+# Ignore package-lock.json files inside packages; keep the root lockfile in git
+packages/*/package-lock.json
+
+# Build outputs
+dist
+build
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
