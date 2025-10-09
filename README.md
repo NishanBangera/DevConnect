@@ -6,7 +6,7 @@ A monorepo for the DevConnect project using npm workspaces.
 
 ```
 dev-connect/
-├── packages/
+├── apps/
 │   └── backend/          # Backend API server
 ├── package.json          # Root package.json with workspaces
 ├── tsconfig.base.json    # Shared TypeScript configuration
@@ -67,9 +67,9 @@ npm install express --workspace=@dev-connect/backend
 npm install -D typescript --workspace=@dev-connect/backend
 ```
 
-## Adding New Packages
+## Adding New Apps
 
-1. Create a new directory in `packages/`
+1. Create a new directory in `apps/`
 2. Initialize with `npm init` or create `package.json` manually
 3. Name it with the `@dev-connect/` scope (e.g., `@dev-connect/frontend`)
 4. Run `npm install` at the root to link workspaces
@@ -77,11 +77,11 @@ npm install -D typescript --workspace=@dev-connect/backend
 ## Scripts
 
 - `npm run dev` - Start backend in development mode
-- `npm run build` - Build all packages
+- `npm run build` - Build all apps
 - `npm run start` - Start backend in production mode
 - `npm run clean` - Clean build artifacts (if implemented)
-- `npm run lint` - Lint all packages (if implemented)
-- `npm run test` - Test all packages (if implemented)
+- `npm run lint` - Lint all apps (if implemented)
+- `npm run test` - Test all apps (if implemented)
 
 ## Repository
 

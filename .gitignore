@@ -1,8 +1,8 @@
 # Dependencies
 # Track the root package-lock.json for reproducible installs in the monorepo
 node_modules
-# Ignore package-lock.json files inside packages; keep the root lockfile in git
-packages/*/package-lock.json
+# Ignore package-lock.json files inside apps; keep the root lockfile in git
+apps/*/package-lock.json
 
 # Build outputs
 dist

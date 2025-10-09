@@ -1,15 +1,9 @@
 import express from 'express';
 import { connectToDatabase } from './lib/db.js';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth.route.js';
 
-// Load environment variables from .env in non-production environments
-if (process.env.NODE_ENV !== 'production') {
-  try {
-    require('dotenv').config();
-  } catch (err) {
-    // If dotenv isn't installed, fail gracefully in environments where envs are provided externally
-    console.warn('dotenv could not be loaded:', err);
-  }
-}
+dotenv.config();
 
 async function start() {
   // Wrap the entire startup sequence so we can log and rethrow errors
@@ -25,6 +19,9 @@ async function start() {
     app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });
+
+    app.use('/api/v1/auth', authRoutes);
+
     const server = app.listen(port, () => {
       console.log(`App listening at http://localhost:${port}`);
     });
