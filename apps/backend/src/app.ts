@@ -1,6 +1,9 @@
 import express from 'express';
 import { connectToDatabase } from './lib/db.js';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 
 dotenv.config();
@@ -15,12 +18,19 @@ async function start() {
     const app = express();
     const port = process.env.PORT ? Number(process.env.PORT) : 3000;
     app.use(express.json());
+    app.use(cookieParser());
+
+    app.use(cors({
+      origin: process.env.FRONTEND_ORIGIN || 'http://localhost:3000',
+      credentials: true
+    }));
 
     app.get('/health', (req, res) => {
       res.status(200).send('OK');
     });
 
-    app.use('/api/v1/auth', authRoutes);
+  app.use('/api/v1/user', userRoutes);
+  app.use('/api/v1/auth', authRoutes);
 
     const server = app.listen(port, () => {
       console.log(`App listening at http://localhost:${port}`);
