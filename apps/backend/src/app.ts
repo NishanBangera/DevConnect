@@ -5,6 +5,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
+import { ApiError } from './utils/apiError.js';
+import { asyncHandler } from './utils/asyncHandler.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -29,8 +32,15 @@ async function start() {
       res.status(200).send('OK');
     });
 
-  app.use('/api/v1/user', userRoutes);
-  app.use('/api/v1/auth', authRoutes);
+    app.get('/test', asyncHandler(async (req, res) => {
+      throw new ApiError(400, "This is a test error");
+    }));
+
+    app.use('/api/v1/user', userRoutes);
+    app.use('/api/v1/auth', authRoutes);
+
+    // Global error handler: must be registered after all routes
+    app.use(errorHandler);
 
     const server = app.listen(port, () => {
       console.log(`App listening at http://localhost:${port}`);

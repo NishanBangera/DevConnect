@@ -36,8 +36,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
     const { firstName, lastName, email, password, age, gender } = req.body;
     const findUser = await User.findOne({ email });
     if (findUser) {
-        res.status(400).send('User already exists');
-        return;
+        return res.status(400).json(new ApiResponse(400, null, 'User already exists'));
     }
 
     const user = new User({ firstName, lastName, email, password, age, gender });
@@ -48,52 +47,47 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
         throw new ApiError(500, "Something went wrong while registering the user");
     }
 
-    res.status(201).send(new ApiResponse(201, createdUser, "User registered successfully"));
+    return res.status(201).json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email }) as IUser | null;
-    if (!user) {
-        res.status(400).send('Invalid email or password1');
-        return;
-    }
+    if (!user) throw new ApiError(400, 'Invalid email or password');
+
     const isMatch = await user.isPasswordCorrect(password);
-    if (!isMatch) {
-        res.status(400).send('Invalid email or password2');
-        return;
-    }
+    if (!isMatch) throw new ApiError(400, 'Invalid email or password');
 
     // generate tokens and set cookie
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
     res.cookie('refreshToken', refreshToken, cookieOptions);
-    return res.status(200).send({ accessToken } as LoginResponse);
+    return res.status(200).json(new ApiResponse(200, { accessToken } as LoginResponse, 'Login successful'));
 });
 
 export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) return res.status(401).send('No refresh token');
+    if (!refreshToken) return res.status(401).json(new ApiResponse(401, null, 'No refresh token'));
 
     // Verify signature
     let decoded: any;
     try {
         decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || 'default_secret');
     } catch (err) {
-        return res.status(401).send('Invalid refresh token');
+        return res.status(401).json(new ApiResponse(401, null, 'Invalid refresh token'));
     }
 
     const user = await User.findById(decoded.userId) as IUser | null;
-    if (!user) return res.status(401).send('User not found');
+    if (!user) return res.status(401).json(new ApiResponse(401, null, 'User not found'));
 
     const incomingHash = hashToken(refreshToken);
     // Find matching stored token
     const stored = ((user.refreshTokens as any) || []).find((t: any) => t.tokenHash === incomingHash);
     if (!stored) {
         // Token reuse detected or token not present
-        // Revoke all refresh tokens for this user as a safety measure
         user.refreshTokens = [] as any;
         await user.save();
-        return res.status(401).send('Refresh token revoked');
+        return res.status(401).json(new ApiResponse(401, null, 'Refresh token revoked'));
     }
 
     // Check expiry
@@ -101,7 +95,7 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
         // Remove expired token
         user.refreshTokens = ((user.refreshTokens as any) || []).filter((t: any) => t.tokenHash !== incomingHash) as any;
         await user.save();
-        return res.status(401).send('Refresh token expired');
+        return res.status(401).json(new ApiResponse(401, null, 'Refresh token expired'));
     }
 
     // Rotate: remove the used refresh token and issue a new one
@@ -116,10 +110,10 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
     // Issue new access token
     const accessToken = user.generateAccessToken();
 
-    res
+    return res
         .cookie('refreshToken', newRefreshToken, cookieOptions)
         .status(200)
-        .send({ accessToken });
+        .json(new ApiResponse(200, { accessToken }, 'Token refreshed'));
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
@@ -136,5 +130,5 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     }
     // Clear cookie using same options so it is correctly removed
     res.clearCookie('refreshToken', cookieOptions);
-    return res.status(200).send({ success: true });
+    return res.status(200).json(new ApiResponse(200, { success: true }, 'Logged out'));
 });
