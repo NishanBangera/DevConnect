@@ -51,3 +51,5 @@ export const updateUserPassword = asyncHandler(async (req: Request, res: Respons
 
     return res.status(200).json(new ApiResponse(200, null, 'Password updated successfully'));
 });
+
+

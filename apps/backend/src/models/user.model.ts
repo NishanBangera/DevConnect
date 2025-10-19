@@ -13,6 +13,8 @@ export interface IUser extends Document {
   description?: string;
   skills?: string[];
   refreshTokens?: { tokenHash: string; expiresAt: Date }[];
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
 
   isPasswordCorrect(password: string): Promise<boolean>;
   generateAccessToken(): string;
@@ -29,7 +31,9 @@ const userSchema = new Schema({
   photoUrl: { type: String },
   description: { type: String },
   skills: { type: [String], default: [] },
-  refreshTokens: { type: [{ tokenHash: String, expiresAt: Date }], default: [] }
+  refreshTokens: { type: [{ tokenHash: String, expiresAt: Date }], default: [] },
+  passwordResetToken: { type: String },
+  passwordResetExpires: { type: Date }
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

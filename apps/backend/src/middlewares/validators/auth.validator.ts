@@ -23,3 +23,13 @@ export const loginValidators = [
     body("email").isEmail().withMessage("A valid email is required"),
     body("password").notEmpty().withMessage("Password is required"),
 ];
+
+// Validator for forgot password
+export const forgotPasswordValidators = [
+    body('email').isEmail().withMessage('A valid email is required')
+];
+
+export const resetPasswordValidators = [
+    body('token').notEmpty().withMessage('Token is required'),
+    body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters long')
+];

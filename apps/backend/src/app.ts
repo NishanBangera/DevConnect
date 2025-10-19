@@ -3,8 +3,7 @@ import { connectToDatabase } from './lib/db.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import userRoutes from './routes/user.route.js';
-import authRoutes from './routes/auth.route.js';
+import routes from './routes/index.js';
 import { ApiError } from './utils/apiError.js';
 import { asyncHandler } from './utils/asyncHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
@@ -36,8 +35,7 @@ async function start() {
       throw new ApiError(400, "This is a test error");
     }));
 
-    app.use('/api/v1/user', userRoutes);
-    app.use('/api/v1/auth', authRoutes);
+    app.use('/api/v1', routes);
 
     // Global error handler: must be registered after all routes
     app.use(errorHandler);

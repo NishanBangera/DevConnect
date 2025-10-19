@@ -132,3 +132,47 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     res.clearCookie('refreshToken', cookieOptions);
     return res.status(200).json(new ApiResponse(200, { success: true }, 'Logged out'));
 });
+
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email }) as IUser | null;
+    // Do not reveal whether the email exists. If it exists, store a reset token.
+    if (!user) {
+        return res.status(200).json(new ApiResponse(200, null, 'If that email exists, a password reset link has been sent'));
+    }
+
+    // generate reset token (plain) and store its hash on the user with expiry
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenHash = hashToken(resetToken);
+    const expiresAt = new Date(Date.now() + (Number(process.env.PASSWORD_RESET_TOKEN_EXPIRY_MS) || 60 * 60 * 1000)); // 1 hour default
+
+    // store hashed token and expiry
+    (user as any).passwordResetToken = resetTokenHash;
+    (user as any).passwordResetExpires = expiresAt;
+    await user.save({ validateBeforeSave: false });
+
+    // In production you would email the reset URL to the user. Since no mailer exists in the project,
+    // return a generic success message. For development (non-production) return the raw token so it can be used.
+    const devData = process.env.NODE_ENV !== 'production' ? { resetToken } : null;
+
+    return res.status(200).json(new ApiResponse(200, devData, 'If that email exists, a password reset link has been sent'));
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) return res.status(400).json(new ApiResponse(400, null, 'Token and new password are required'));
+
+    const tokenHash = hashToken(token);
+    const user = await User.findOne({ passwordResetToken: tokenHash, passwordResetExpires: { $gt: new Date() } }) as IUser | null;
+    if (!user) return res.status(400).json(new ApiResponse(400, null, 'Invalid or expired token'));
+
+    // update password and clear reset fields and refresh tokens
+    user.password = newPassword as any;
+    (user as any).passwordResetToken = undefined;
+    (user as any).passwordResetExpires = undefined;
+    user.refreshTokens = [] as any;
+    await user.save();
+
+    return res.status(200).json(new ApiResponse(200, null, 'Password has been reset successfully'));
+});
