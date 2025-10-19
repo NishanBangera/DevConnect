@@ -1,25 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { Schema, model, Document } from "mongoose";
-
-export interface IUser extends Document {
-  firstName: string;
-  lastName?: string;
-  email: string;
-  password: string;
-  age?: number;
-  gender?: string;
-  photoUrl?: string;
-  description?: string;
-  skills?: string[];
-  refreshTokens?: { tokenHash: string; expiresAt: Date }[];
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
-
-  isPasswordCorrect(password: string): Promise<boolean>;
-  generateAccessToken(): string;
-  generateRefreshToken(): string;
-}
+import { Schema, model } from "mongoose";
+import { IUser } from "../types/user.types.js";
 
 const userSchema = new Schema({
   firstName: { type: String, minLength: 4, required: true },
@@ -27,7 +9,7 @@ const userSchema = new Schema({
   email: { type: String, lowercase: true, trim: true, required: true, unique: true },
   password: { type: String, required: true },
   age: { type: Number, min: 13 },
-  gender: { type: String, enum: ['male', 'female', 'other'] },
+  gender: { type: String, enum: { values: ['male', 'female', 'other'], message: '{VALUE} is not a valid gender' } },
   photoUrl: { type: String },
   description: { type: String },
   skills: { type: [String], default: [] },

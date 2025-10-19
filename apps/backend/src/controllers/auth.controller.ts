@@ -1,14 +1,11 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import User, { IUser } from "../models/user.model.js";
+import User from "../models/user.model.js";
+import { IUser, LoginResponse } from "../types/index.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { ApiError } from "../utils/apiError.js";
-
-interface LoginResponse {
-    accessToken: string;
-}
 
 const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');
 

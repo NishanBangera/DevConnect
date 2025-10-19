@@ -1,15 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { Document } from "mongoose";
 import User from "../../models/user.model.js";
-
-interface DecodedUser {
-    userId: string;
-}
-
-interface AuthenticatedRequest extends Request {
-    user?: DecodedUser | Document;
-}
+import { DecodedUser, AuthenticatedRequest } from "../../types/auth.types.js";
 
 export const userAuth = async (
     req: AuthenticatedRequest,
@@ -28,7 +20,7 @@ export const userAuth = async (
             if (!user) {
                 return res.status(401).send('Access Denied: User Not Found');
             }
-            req.user = user;
+            req.userId = user._id as string;
             next();
         } else {
             res.status(401).send('Access Denied: Invalid Token');

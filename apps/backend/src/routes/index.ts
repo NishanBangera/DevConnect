@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import authRoutes from './auth.route.js';
 import userRoutes from './user.route.js';
+// import requestRoutes from './request.route.js';
 
 const router = Router();
 
-// Mount public auth-related routes under /auth
 router.use('/auth', authRoutes);
-
-// Mount user-related routes under /user (these routes themselves apply auth middleware where needed)
 router.use('/user', userRoutes);
+// router.use('/request', requestRoutes);
 
 export default router;
