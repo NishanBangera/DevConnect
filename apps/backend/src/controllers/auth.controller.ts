@@ -31,10 +31,6 @@ const generateAccessAndRefreshTokens = async (user: IUser) => {
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
     const { firstName, lastName, email, password, age, gender } = req.body;
-    const findUser = await User.findOne({ email });
-    if (findUser) {
-        return res.status(400).json(new ApiResponse(400, null, 'User already exists'));
-    }
 
     const user = new User({ firstName, lastName, email, password, age, gender });
     await user.save();

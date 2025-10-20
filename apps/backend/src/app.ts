@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import routes from './routes/index.js';
 import { ApiError } from './utils/apiError.js';
+import { ApiResponse } from './utils/apiResponse.js';
 import { asyncHandler } from './utils/asyncHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
 
@@ -28,7 +29,7 @@ async function start() {
     }));
 
     app.get('/health', (req, res) => {
-      res.status(200).send('OK');
+      res.status(200).json(new ApiResponse(200, { ok: true }, 'OK'));
     });
 
     app.get('/test', asyncHandler(async (req, res) => {

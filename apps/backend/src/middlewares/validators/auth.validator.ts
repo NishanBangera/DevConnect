@@ -1,10 +1,19 @@
 import { body } from "express-validator";
+import User from "../../models/user.model.js";
 
 // Validators for register route
 export const registerValidators = [
     body("firstName").trim().notEmpty().withMessage("First name is required"),
     body("lastName").trim().notEmpty().withMessage("Last name is required"),
-    body("email").isEmail().withMessage("A valid email is required"),
+    body("email")
+        .isEmail().withMessage("A valid email is required")
+        .custom(async (email) => {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                throw new Error('User already exists');
+            }
+            return true;
+        }),
     body("password")
         .isLength({ min: 6 })
         .withMessage("Password must be at least 6 characters long"),
