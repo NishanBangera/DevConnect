@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { loginUser, registerUser, refreshToken, logout, forgotPassword, resetPassword } from "../controllers/auth.controller.js";
-import { handleValidationErrors } from "../middlewares/validators/validator.js";
+import { handleValidationErrors } from "../middlewares/validators/error.validator.js";
 import { loginValidators, registerValidators, forgotPasswordValidators, resetPasswordValidators } from "../middlewares/validators/auth.validator.js";
 
 const authRoutes = Router();
